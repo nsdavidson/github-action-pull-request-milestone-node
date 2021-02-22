@@ -44,7 +44,11 @@ async function action() {
     });
 
     const pullCount = pulls.length;
-    console.log(`There are ${pullCount} Pull Requests`);
+    const message = core.getInput(`merged_${pullCount}`);
+    if (!message) {
+        console.log("No action required");
+        return;
+    }
 }
 
 if (require.main === module) {
