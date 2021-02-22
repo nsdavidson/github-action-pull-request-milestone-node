@@ -49,6 +49,23 @@ async function action() {
         console.log("No action required");
         return;
     }
+
+    await octokit.issues.createComment({
+        ...github.context.repo,
+        issue_number: github.context.issue.number,
+        body: message,
+    });
+
+    console.log(stripIndent`
+        Added comment:
+        ${message}
+    `);
+
+    await octokit.issues.addLabels({
+        ...github.context.repo,
+        issue_number: github.context.issue.number,
+        labels: ['merge-milestone', `merge-milestone:${pullCount}`]
+    })
 }
 
 if (require.main === module) {
