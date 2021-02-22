@@ -21,6 +21,30 @@ async function action() {
         core.warning("Pull request closed without merge");
         return;
     }
+
+    const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+
+    let pulls = await octokit.paginate(
+        "GET /repos/:owner/:repo/pulls",
+        {
+            ...github.context.repo,
+            state: "closed",
+            per_page: 100,
+        },
+        (response)  => response.data
+    );
+
+    const expectedAuthor = payload.pull_request.user.login;
+    pulls = pulls.filter((p) => {
+        if (!p.merged_at) {
+            return false;
+        }
+
+        return p.user.login == expectedAuthor;
+    });
+
+    const pullCount = pulls.length;
+    console.log(`There are ${pullCount} Pull Requests`);
 }
 
 if (require.main === module) {
